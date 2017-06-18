@@ -4,17 +4,21 @@
 #include <cstring>
 #include <cstdio>
 
+#define assert(cond, message) {\
+	if (!(cond)) {\
+		std::cerr << "Assert failed on line :  " << __LINE__ << "." << (message) << " Aborting!\n";\
+		std::abort();\
+	}\
+}
+
 int main(int argc, char* argv[]) {
 	if (argc != 4) {
 		std::cout << "Usage:\n";
 		std::cout << "./menu filename classname objectname\n";
-		exit(0);
+		exit(1);
 	}
 	std::ifstream ifile(argv[1]);
-	if (!ifile) {
-		std::cout << "File open error.\n";
-		exit(0);
-	}
+	assert(ifile, "File open error!");
 	int cnt = 0;
 	// global lists for the menu, the methods needed and the arguements for these methods.
 	char menu[100][100], method[100][100], args[100][100];
@@ -48,13 +52,11 @@ int main(int argc, char* argv[]) {
 	}
 	ifile.close();
 	std::fstream file(argv[1], std::ios::app);
+	assert(file,"File open error");
 	char program[] = "\nint main() {\n\tint op;\n\tdo {\n\t\tsystem(\"clear\");\n\t\tcout << \"Menu\\n\";\n";
 	file.write(program,strlen(program));
 	for (int i = 0; i < cnt; i++) {
-		char t[] = "\t\tcout << \"";
-		strcat(t,menu[i]);
-		strcat(t, "\\n\";\n");
-		file.write(t,strlen(t));
+		file << "\t\tcout << \"" << menu[i] << "\\n\"\n";
 	}
 	char exit[100];
 	sprintf(exit, "\t\tcout << \"%d. Exit\\n\";\n", cnt+1);
